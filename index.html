@@ -1,30 +1,42 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Labs 4 & 5: Interactive Visualization with D3.js</title>
-    <link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
-    <div class="container"> <!-- Centers content and sets max width -->
-        <h1>Labs 4 & 5: Interactive Visualization with D3.js</h1>
 
-        <div class="controls">
-            // placeholder for a slider
-            X: <select id="xVariable" class="variable"></select>
-            Y: <select id="yVariable" class="variable"></select>
-            size: <select id="sizeVariable" class="variable"></select>
-        </div>
+    <title>College Outcomes by Percentile</title>
 
-        <div id="vis"></div> <!--  Will hold our visualization (SVG) -->
-    
-    </div>
-
-    
-    <!-- Load D3.js -->
+    <!-- D3 -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="./d3-simple-slider.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #chart {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        svg {
+            display: block;
+            margin: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>College Outcomes by Percentile</h1>
+
+    <div id="chart"></div>
+
     <script src="js/script.js"></script>
+
 </body>
 </html>
+```
