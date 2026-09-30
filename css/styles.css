@@ -1,0 +1,49 @@
+/* Reset default styles */
+* {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0px auto;
+    line-height: 1.8;
+}
+
+/* Container styling for layout */
+.container {
+    max-width: 800px;
+    margin: 2rem auto;
+    font-family: Arial, sans-serif;
+}
+
+/* select id = vis's element with class svg*/
+
+#vis svg {
+    margin: 2rem 0;
+    border: 1px solid #ccc; /*otherwise you can't see this part*/
+}
+
+.x-axis path,
+.y-axis path,
+.x-axis line,
+.y-axis line {
+    stroke: #333333;
+    shape-rendering: crispEdges;
+}
+
+.y-grid-axis text {
+    opacity: 0
+}
+
+.x-axis text,
+.y-axis text {
+    font-size: 12px;
+    font-family: Arial, sans-serif;
+}
+
+.axis-label {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* button {
+    padding: 8px 16px;
+    margin-right: 10px;
+} */
