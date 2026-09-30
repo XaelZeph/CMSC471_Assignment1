@@ -20,13 +20,10 @@ const innerWidth = width - margin.left - margin.right;
 const innerHeight = height - margin.top - margin.bottom;
 
 
-// ============================================================
-// LOAD DATA
-// ============================================================
+// Load data, convert all data to numeric
 
 d3.csv("data/national_percentile_outcomes.csv").then(data => {
 
-  // Convert percentile to number
   data.forEach(d => {
       d.percentile = +d.par_pctile;
   });
@@ -36,14 +33,9 @@ d3.csv("data/national_percentile_outcomes.csv").then(data => {
   // CHOOSE RACE
   // ========================================================
 
-  // Change this to:
-  // asian
-  // black
-  // hisp
-  // white
-  // natam
-  // other
-  // pooled
+  // For now we are only looking at pooled race
+
+  // Options: asian, black, hisp, white, natam, other, pooled
 
   const race = "pooled";
 
@@ -55,27 +47,19 @@ d3.csv("data/national_percentile_outcomes.csv").then(data => {
   console.log("Male column:", maleColumn);
   console.log("Female column:", femaleColumn);
 
-
-  // ========================================================
-  // PREPARE DATA
-  // ========================================================
-
   data.forEach(d => {
       d.male = +d[maleColumn];
       d.female = +d[femaleColumn];
   });
 
-  // Remove rows where the outcome is missing
+  // Remove rows where the college outcome (column value) is missing
   data = data.filter(d =>
       Number.isFinite(d.male) &&
       Number.isFinite(d.female)
   );
 
 
-  // ========================================================
-  // X SCALE
-  // ========================================================
-
+  // Find upper end of the range for college outcomes
   // Find largest value across both genders
   const maxValue = d3.max(data, d =>
       Math.max(d.male, d.female)
@@ -89,25 +73,20 @@ d3.csv("data/national_percentile_outcomes.csv").then(data => {
       .range([0, innerWidth]);
 
 
-  // ========================================================
-  // Y SCALE
-  // ========================================================
+  // Y-scale range is just 1-100 for the percentiles
 
   const y = d3.scaleLinear()
       .domain([1, 100])
       .range([innerHeight, 0]);
 
 
-  // ========================================================
-  // BAR HEIGHT
-  // ========================================================
+  // Set bar height? Revisit to understand
+  // This ensures that bars aren't touching (so we add vertical space)
 
   const barHeight = innerHeight / data.length * 0.85;
 
 
-  // ========================================================
-  // CENTER LINE
-  // ========================================================
+  // Create center line for the male vs. female sections
 
   g.append("line")
       .attr("x1", x(0))
@@ -118,9 +97,7 @@ d3.csv("data/national_percentile_outcomes.csv").then(data => {
       .attr("stroke-width", 2);
 
 
-  // ========================================================
   // MALE BARS
-  // ========================================================
 
   g.selectAll(".male-bar")
       .data(data)
@@ -143,10 +120,7 @@ d3.csv("data/national_percentile_outcomes.csv").then(data => {
 
       .attr("fill", "#4A90E2");
 
-
-  // ========================================================
   // FEMALE BARS
-  // ========================================================
 
   g.selectAll(".female-bar")
       .data(data)
@@ -170,9 +144,7 @@ d3.csv("data/national_percentile_outcomes.csv").then(data => {
       .attr("fill", "#E88AA8");
 
 
-  // ========================================================
   // X AXIS
-  // ========================================================
 
   g.append("g")
       .attr(
@@ -186,9 +158,7 @@ d3.csv("data/national_percentile_outcomes.csv").then(data => {
       );
 
 
-  // ========================================================
   // Y AXIS
-  // ========================================================
 
   g.append("g")
       .call(
@@ -198,9 +168,7 @@ d3.csv("data/national_percentile_outcomes.csv").then(data => {
       );
 
 
-  // ========================================================
-  // X AXIS LABEL
-  // ========================================================
+  // X AXIS name
 
   g.append("text")
       .attr("x", innerWidth / 2)
@@ -211,9 +179,7 @@ d3.csv("data/national_percentile_outcomes.csv").then(data => {
       .text("College outcome");
 
 
-  // ========================================================
-  // Y AXIS LABEL
-  // ========================================================
+  // Y AXIS name
 
   g.append("text")
       .attr("transform", "rotate(-90)")
@@ -225,9 +191,7 @@ d3.csv("data/national_percentile_outcomes.csv").then(data => {
       .text("Parent income percentile");
 
 
-  // ========================================================
-  // TITLE
-  // ========================================================
+  // Graph title
 
   g.append("text")
       .attr("x", innerWidth / 2)
@@ -238,9 +202,7 @@ d3.csv("data/national_percentile_outcomes.csv").then(data => {
       .text(`College outcome by percentile (${race})`);
 
 
-  // ========================================================
-  // LEGEND
-  // ========================================================
+  // Legend showing blue = male and pink = female
 
   const legend = g.append("g")
       .attr("transform", `translate(${innerWidth - 150}, -35)`);
