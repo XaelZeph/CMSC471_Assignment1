@@ -127,7 +127,7 @@ const margin = {
         .attr("x", d => x(-d.male))
   
         .attr("y", d =>
-            y(d.percentile) - barHeight / 2
+            y(d.percentile) - barHeight 
         )
   
         // Width from male value to zero
@@ -151,7 +151,7 @@ const margin = {
         .attr("x", x(0))
   
         .attr("y", d =>
-            y(d.percentile) - barHeight / 2
+            y(d.percentile) - barHeight 
         )
   
         // Width from zero to female value
