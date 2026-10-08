@@ -1,7 +1,7 @@
 /* Reset default styles */
 * {
     font-family: Arial, sans-serif;
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0px auto;
     line-height: 1.8;
 }
@@ -12,6 +12,22 @@
     margin: 2rem auto;
     font-family: Arial, sans-serif;
 }
+
+.controls {
+    display: flex;
+    justify-content: flex-start;
+    gap: 30px;
+}
+.dropDowns {
+    margin: 0px ;
+}
+.checkBoxes {
+    display:flex;
+    gap: 8px;
+    margin: 0px ;
+
+}
+
 
 /* select id = vis's element with class svg*/
 

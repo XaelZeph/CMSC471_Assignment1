@@ -9,23 +9,7 @@
     <!-- D3 -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
-
-        #chart {
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        svg {
-            display: block;
-            margin: auto;
-        }
-    </style>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
@@ -37,8 +21,8 @@
             Outcomes: <select id="xVariable" class="variable"></select>
         </div>
 
-        <div class="checkBoxes">      
-            <p>Race:</p>
+        <div class="checkBoxes">  
+            Race:    
             <input type="checkbox" id="pooled" class="race" value="pooled", checked="checked"> Pooled
             <input type="checkbox" id="white" class="race" value="white"> White
             <input type="checkbox" id="black" class="race" value="black"> Black
