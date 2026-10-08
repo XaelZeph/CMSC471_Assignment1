@@ -377,34 +377,83 @@ function updateVis() {
       .join(
         // When we have new data points
         function(enter){
-            console.log("enter")
-            return enter
-            // create male-bar rectangle
-            .append("rect")
-            .attr("class", "male-bar")
-            // moves from left to zero
-            .attr("x", d => xScales[i](-d[query_male]))
-            .attr("y", d => yScales[i](d.par_pctile) - barHeight)
-            .attr("width", d => xScales[i](0) - xScales[i](-d[query_male]))
-            .attr("height", barHeight)
-            .attr('fill', '#4A90E2')
+          console.log("enter")
+          return enter
+          // create male-bar rectangle
+          .append("rect")
+          .attr("class", "male-bar")
+          // moves from left to zero
+          .attr("x", d => xScales[i](-d[query_male]))
+          .attr("y", d => yScales[i](d.par_pctile) - barHeight)
+          .attr("width", d => xScales[i](0) - xScales[i](-d[query_male]))
+          .attr("height", barHeight)
+          .attr('fill', '#4A90E2')
+
+          // THIS IS MOUSEOVER/TOOLTIP STUFF
+          .on('mouseover', function (event, d) {
+            console.log(d) // for debugging
+            console.log(event.pageX + 28) // for debugging
+            
+            percentile = d.par_pctile + "th"
+
+            if (d.par_pctile == 1) {
+              percentile = d.par_pctile + "st"
+            }
+            else if (d.par_pctile == 2) {
+              percentile = d.par_pctile + "nd"
+            }
+            else if (d.par_pctile == 3) {
+              percentile = d.par_pctile + "rd"
+            }
+
+            d3.select('#tooltip')
+              .style("display", 'block') // Make the tooltip visible
+
+              // strong = bolded p
+              .html( // display ex: 1st ["pooled" : 0.83]
+              `<strong>${percentile + " Percentile"}</strong><br/>
+              ${readableOutcomes[outcomes.indexOf(xVar)]} %: ${d[query_male]}`)
+              
+              // event.pageX and event.pageY returns event (in this case mouse) X and Y
+              // this is male bars, so have it on the left side (uses "right")
+              // places it juuuuust slightly left and below th emouse
+              .style("right", (-event.pageX + 1375) + "px")
+              // resetting (for when left is set for female-bars)
+              .style("left", "auto")
+              .style("top", (event.pageY - 28) + "px");
+
+            // this highlights the hovered bar
+            d3.select(this) 
+              .style('stroke', 'black')
+              .style('stroke-width', '4px')
+          })
+          .on("mouseout", function (event, d) {
+            d3.select('#tooltip')
+            // sets it to be invisible
+            .style('display', 'none')
+            
+            // unhighlights the hovered bar
+            d3.select(this) 
+              .style('stroke', 'None')
+              .style('stroke-width', '0px')
+          })
         },
         // Update existing points when data changes
         function(update){
-            console.log("update")
-            return update
-            // Smoothly move to new positions/sizes
-            .transition().duration(t)
+          console.log("update")
+          return update
+          // Smoothly move to new positions/sizes
+          .transition().duration(t)
 
-            // update data points (x, y, and size)
-            .attr('x', d => xScales[i](-d[query_male]))
-            .attr('y', d => yScales[i](d.par_pctile) - barHeight)
-            .attr("width", d => xScales[i](0) - xScales[i](-d[query_male]))
+          // update data points (x, y, and size)
+          .attr('x', d => xScales[i](-d[query_male]))
+          .attr('y', d => yScales[i](d.par_pctile) - barHeight)
+          .attr("width", d => xScales[i](0) - xScales[i](-d[query_male]))
         },
         // Remove points that no longer exist in the filtered data 
         function(exit){
-            return exit
-            .remove()
+          return exit
+          .remove()
         }
       )
 
@@ -413,32 +462,80 @@ function updateVis() {
       .join(
         // When we have new data points
         function(enter){
-            return enter
-            // create male-bar rectangle
-            .append("rect")
-            .attr("class", "female-bar")
-            // moves from left to zero
-            .attr("x", xScales[i](0))
-            .attr("y", d => yScales[i](d.par_pctile) - barHeight)
-            .attr("width", d => xScales[i](d[query_female]) - xScales[i](0))
-            .attr("height", barHeight)
-            .attr('fill', colorScale[1])
+          return enter
+          // create male-bar rectangle
+          .append("rect")
+          .attr("class", "female-bar")
+          // moves from left to zero
+          .attr("x", xScales[i](0))
+          .attr("y", d => yScales[i](d.par_pctile) - barHeight)
+          .attr("width", d => xScales[i](d[query_female]) - xScales[i](0))
+          .attr("height", barHeight)
+          .attr('fill', colorScale[1])
+
+                      // THIS IS MOUSEOVER/TOOLTIP STUFF
+          .on('mouseover', function (event, d) {
+            console.log(d) // for debugging
+            console.log(event.pageX + 28) // for debugging
+            
+            percentile = d.par_pctile + "th"
+
+            if (d.par_pctile == 1) {
+              percentile = d.par_pctile + "st"
+            }
+            else if (d.par_pctile == 2) {
+              percentile = d.par_pctile + "nd"
+            }
+            else if (d.par_pctile == 3) {
+              percentile = d.par_pctile + "rd"
+            }
+
+            d3.select('#tooltip')
+              .style("display", 'block') // Make the tooltip visible
+
+              // strong = bolded p
+              .html( // display ex: 1st ["pooled" : 0.83]
+              `<strong>${percentile + " Percentile"}</strong><br/>
+              ${readableOutcomes[outcomes.indexOf(xVar)]} %: ${d[query_male]}`)
+              
+              // event.pageX and event.pageY returns event (in this case mouse) X and Y
+              // this is female bars, so have it on the right side (uses "left")
+              .style("left", (event.pageX + 25) + "px")
+              // resetting (for when right is set for male-bars)
+              .style("right", "auto")
+              .style("top", (event.pageY - 28) + "px");
+
+            // this highlights the hovered bar
+            d3.select(this) 
+              .style('stroke', 'black')
+              .style('stroke-width', '4px')
+          })
+          .on("mouseout", function (event, d) {
+            d3.select('#tooltip')
+            // sets it to be invisible
+            .style('display', 'none')
+            
+            // unhighlights the hovered bar
+            d3.select(this) 
+              .style('stroke', 'None')
+              .style('stroke-width', '0px')
+          })
         },
         // Update existing points when data changes
         function(update){
-            return update
-            // Smoothly move to new positions/sizes
-            .transition().duration(t)
+          return update
+          // Smoothly move to new positions/sizes
+          .transition().duration(t)
 
-            // update data points (x, y, and size)
-            .attr("x", xScales[i](0))
-            .attr("y", d => yScales[i](d.par_pctile) - barHeight)
-            .attr("width", d => xScales[i](d[query_female]) - xScales[i](0))
+          // update data points (x, y, and size)
+          .attr("x", xScales[i](0))
+          .attr("y", d => yScales[i](d.par_pctile) - barHeight)
+          .attr("width", d => xScales[i](d[query_female]) - xScales[i](0))
         },
         // Remove points that no longer exist in the filtered data 
         function(exit){
-            return exit
-            .remove()
+          return exit
+          .remove()
         }
       )
   })
