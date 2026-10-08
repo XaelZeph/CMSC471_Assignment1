@@ -1,11 +1,9 @@
-
-const margin = {top: 80, right: 60, bottom: 60, left: 100};
+const margin = {top: 80, right: 30, bottom: 60, left: 45};
 const width = 800;
 const height = 600;
 
 const innerWidth = width - margin.left - margin.right;
 const innerHeight = height - margin.top - margin.bottom;
-const padding = 30;
 
 let allData = [];
 let graphs = [];
@@ -85,7 +83,7 @@ function setupDropDown() {
   d3.selectAll('.variable')
     // loop over each dropdown button
     .each(function() {
-      d3.select(this).selectAll('outcomeOptions')
+      d3.select(this).selectAll('option')
       .data(outcomes) // .data loops through options
       .enter() 
       .append('option') 
@@ -98,9 +96,7 @@ function setupDropDown() {
     .on('change', function (event) {
       xVar = d3.select(this).property("value")
       // update chart
-      svg.selectAll('.axis').remove()
-      svg.selectAll('.label').remove()
-      svg.selectAll('.title').remove()
+      graphs.forEach(g => g.selectAll('.axis, .label, .title').remove())
       updateAxes(); 
       updateVis();
 
@@ -130,7 +126,7 @@ function setupCheckBox() {
         
         // index is here just in case javascript acts similarly to python, 
         // where unexpecte behaviors happen when deleting inside of a foreach loop
-        index = 0
+        let index = -1
         // go through graph list, find list with checkbox's race, and delete it
         graphs.forEach((g, i) => {
           if (g.race == this.value) {
@@ -138,16 +134,17 @@ function setupCheckBox() {
           }
         })
 
-        
-        // remove from array
-        graphs.splice(index, 1)
+        if (index !== -1) {
+          // remove from array
+          graphs.splice(index, 1)
+        }
 
         // now actually remove from svg
         // grab using index (which is set in createGraph), then .remove
         d3.select(`#graph_${this.value}`).remove()
-        svg.selectAll('.axis').remove()
-        svg.selectAll('.label').remove()
-        svg.selectAll('.title').remove()
+        
+        // clean up sub-elements from remaining graphs before recalculating
+        graphs.forEach(g => g.selectAll('.axis, .label, .title').remove())
 
         // TODO: currently not working
         recalcSizes()
@@ -159,40 +156,48 @@ function setupCheckBox() {
 }
 
 function recalcSizes() {
-  const width = (innerWidth - padding) / graphs.length 
-  console.log("calculated width: " + width)
+  if (graphs.length === 0) return;
 
-  // TO BE DETERMINED
-  const height = width * .75
+  const count = graphs.length;
 
-  // update all parameters as 
+  // Scale padding down as graph count increases to keep everything inside innerWidth
+  let padding = 45;
+  if (count === 4) padding = 38;
+  if (count === 5) padding = 32;
+  if (count === 6) padding = 28;
+
+  const chartWidth = (innerWidth - padding * (count - 1)) / count;
+  const height = innerHeight;
+
+  // update all parameters
   graphs.forEach((g, i) => {
-    // TODO: uh i can't seem to calculate xStart correctly whoops
-    xStart = i * (padding + width) + padding 
+    xStart = margin.left + i * (padding + chartWidth);
+    
+    // store attributes directly on graph object
+    g.width = chartWidth;
+    g.height = height;
+    g.x = xStart;
+
     // set new center, new innerWidth, new innerHeight, new translate(x, )
-    g.property('width', width)
-    .property('height', height)
-    .property('x', xStart)
-    .attr('transform', `translate(${xStart}, ${margin.top})`)
+    g.attr('transform', `translate(${xStart}, ${margin.top})`);
 
-    console.log('id: ' + g.property('id'))
-    console.log('race: ' + g.property('race'))
-    console.log('width: ' + g.property('width'))
-    console.log('height: ' + g.property('height'))
-    console.log('x: ' + g.property('x'))
-  })
-
+    console.log('id: ' + g.attr('id'));
+    console.log('race: ' + g.race);
+    console.log('width: ' + g.width);
+    console.log('height: ' + g.height);
+    console.log('x: ' + g.x);
+  });
 }
 
 function createGraph(race) {
 
   // new graph is being added, make sure to remove all previous axis + labels + data
-  svg.selectAll('.axis').remove()
-  svg.selectAll('.label').remove()
+  graphs.forEach(g => g.selectAll('.axis, .label, .title').remove())
   
   const g = svg.append("g")
-    .property('id', `graph_${race}`)
-    .property('race', `${race}`)
+    .attr('id', `graph_${race}`)
+
+  g.race = race;
 
   graphs.push(g)
 
@@ -203,16 +208,16 @@ function createGraph(race) {
   //   .attr("id", "chart-clip");
 
   // clip.append("rect")
-  //   .attr("x", g.property('x'))
+  //   .attr("x", g.x)
   //   .attr("y", 0)
-  //   .attr("width", g.property('width'))
-  //   .attr("height", g.property('height'));
+  //   .attr("width", g.width)
+  //   .attr("height", g.height);
 
   // console.log(clip.width)
   // console.log(clip.height)
 
   // Put bars inside the clipped graph area
-  const bars = g.append("g").property('id', `graph_${race}_bars`)
+  const bars = g.append("g").attr('id', `graph_${race}_bars`)
     // .attr("clip-path", "url(#chart-clip)");
 
   recalcSizes()
@@ -226,19 +231,24 @@ function updateAxes() {
   maxValue = -Infinity
 
   graphs.forEach(g => {
-    const query_male = `${xVar}_${g.property('race')}_male`
-    const query_female = `${xVar}_${g.property('race')}_female`
+    // remove previous axis/labels attached specifically to this graph
+    g.selectAll('.axis, .label, .title').remove()
+
+    const query_male = `${xVar}_${g.race}_male`
+    const query_female = `${xVar}_${g.race}_female`
     
     // Find upper end of the range for selected outcomes
     // Find largest value across both genders + all graphs
     const mv = d3.max(allData, d =>
-        Math.max(d[query_male], d[query_female])
+        Math.max(d[query_male] || 0, d[query_female] || 0)
     );
 
     if (mv > maxValue) {
       maxValue = mv
     }
   })
+
+  if (maxValue === -Infinity || maxValue === 0) maxValue = 1;
 
   console.log("maxValue Calculated for all graphs: " + maxValue)
 
@@ -249,22 +259,21 @@ function updateAxes() {
     const xScale = d3.scaleLinear()
       .domain([-maxValue, maxValue])
       .nice()
-      .range([g.property('x'), g.property('width')]);
+      .range([0, g.width]);
 
     xScales[i] = xScale
 
     // Y-scale range is just 1-100 for the percentiles
     const yScale = d3.scaleLinear()
       .domain([1, 100])
-      .range([g.property('height'), 0]);
+      .range([g.height, 0]);
 
     yScales[i] = yScale
 
     // X AXIS
     const xAxis = d3.axisBottom(xScale)
-      .ticks(10)
-      // .tickFormat(d => Math.abs(d))
-      
+      .ticks(Math.max(2, Math.floor(g.width / 35)))
+      .tickFormat(d => Math.abs(d))
 
     // Y AXIS
     const yAxis = d3.axisLeft(yScale)
@@ -290,51 +299,51 @@ function updateAxes() {
     g.append("g")
       .attr(
           "transform",
-          `translate(0,${g.property('height')})`
+          `translate(0,${g.height})`
       )
       .attr('class', 'axis')
       .call(xAxis);
 
+    // Render Y-axis on every graph
     g.append("g")
-      .attr(
-        "transform",
-        `translate(${g.property('x')}, 0)`
-      )
+      .attr("transform", "translate(0, 0)")
       .call(yAxis)
       .attr('class', 'axis');
 
-
-    // X AXIS name
-    g.append("text")
-      .attr("x", (g.property('width') / 2) + g.property('x'))
-      .attr("y", g.property('height') + 35)
-      .attr("text-anchor", "middle")
-      .attr("fill", "black")
-      .style("font-size", "12px")
-      .text(xVar)
-      .attr('class', 'label');
-
+    // Dynamic label offset and font sizes based on chart density
+    const yLabelOffset = graphs.length > 4 ? -20 : -25;
+    const labelFontSize = graphs.length > 4 ? "8px" : "10px";
+    const titleFontSize = graphs.length > 4 ? "10px" : (graphs.length > 2 ? "12px" : "14px");
 
     // Y AXIS name
     g.append("text")
       .attr("transform", "rotate(-90)")
-      .attr("x", -g.property('height') / 2)
-      .attr("y", g.property('x') - 40)
+      .attr("x", -g.height / 2)
+      .attr("y", yLabelOffset)
       .attr("text-anchor", "middle")
       .attr("fill", "black")
-      .style("font-size", "12px")
+      .style("font-size", labelFontSize)
       .text("Parent income percentile")
       .attr('class', 'label');
 
+    // X AXIS name
+    g.append("text")
+      .attr("x", g.width / 2)
+      .attr("y", g.height + 35)
+      .attr("text-anchor", "middle")
+      .attr("fill", "black")
+      .style("font-size", "11px")
+      .text(xVar)
+      .attr('class', 'label');
 
     // Graph title
     g.append("text")
-      .attr("x", (g.property('width') / 2) + g.property('x'))
+      .attr("x", g.width / 2)
       .attr("y", -12)
       .attr("text-anchor", "middle")
-      .style("font-size", "15px")
+      .style("font-size", titleFontSize)
       .style("font-weight", "bold")
-      .text(`${readableOutcomes[outcomes.indexOf(xVar)]} by Parent Income Percentile (${g.property('race')})`)
+      .text(`${readableOutcomes[outcomes.indexOf(xVar)]} (${g.race})`)
       .attr('class', 'title');
   })
 }
@@ -343,12 +352,12 @@ function updateVis() {
   graphs.forEach((g, i) => {
     // Set bar height? Revisit to understand
     // This ensures that bars aren't touching (so we add vertical space)
-    const barHeight = g.property('height') / allData.length * 0.85;
+    const barHeight = Math.max(1, (g.height / allData.length) * 0.85);
 
     console.log("barHeight for " + i + 'th graph:' + barHeight)
 
-    const query_male = `${xVar}_${g.property('race')}_male`
-    const query_female = `${xVar}_${g.property('race')}_female`
+    const query_male = `${xVar}_${g.race}_male`
+    const query_female = `${xVar}_${g.race}_female`
 
     // Remove rows where the outcome (column value) is missing
     filteredData = allData.filter(d =>
@@ -358,7 +367,7 @@ function updateVis() {
 
     console.log(filteredData)
 
-    bars = g.select(`#graph_${g.property('race')}_bars`)
+    bars = g.select(`#graph_${g.race}_bars`)
 
     bars.selectAll('.male-bar')
       .data(filteredData)
@@ -367,7 +376,6 @@ function updateVis() {
         function(enter){
             console.log("enter")
             return enter
-
             // create male-bar rectangle
             .append("rect")
             .attr("class", "male-bar")
@@ -383,7 +391,7 @@ function updateVis() {
             console.log("update")
             return update
             // Smoothly move to new positions/sizes
-            .transition(t)
+            .transition().duration(t)
 
             // update data points (x, y, and size)
             .attr('x', d => xScales[i](-d[query_male]))
@@ -392,10 +400,10 @@ function updateVis() {
         },
         // Remove points that no longer exist in the filtered data 
         function(exit){
-            exit
+            return exit
             .remove()
         }
-    )
+      )
 
     bars.selectAll('.female-bar')
       .data(filteredData)
@@ -403,7 +411,6 @@ function updateVis() {
         // When we have new data points
         function(enter){
             return enter
-
             // create male-bar rectangle
             .append("rect")
             .attr("class", "female-bar")
@@ -418,7 +425,7 @@ function updateVis() {
         function(update){
             return update
             // Smoothly move to new positions/sizes
-            .transition(t)
+            .transition().duration(t)
 
             // update data points (x, y, and size)
             .attr("x", xScales[i](0))
@@ -427,10 +434,10 @@ function updateVis() {
         },
         // Remove points that no longer exist in the filtered data 
         function(exit){
-            exit
+            return exit
             .remove()
         }
-    )
+      )
   })
 
 }
@@ -438,15 +445,13 @@ function updateVis() {
 function addLegend() {
   console.log("legend created")
   // Legend showing blue = male and pink = female
-  // Place the legend above the graph so it does not overlap with the data
+  // Positioned top right within margin bounds
 
   const legend = svg.append("g")
   .attr(
       "transform",
-      `translate(${innerWidth}, 0)`
+      `translate(${width - margin.right - 120}, 20)`
   );
-
-  // change this to loop through the graphs
 
   // Male
   legend.append("rect")
