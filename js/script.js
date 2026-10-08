@@ -417,7 +417,8 @@ function updateVis() {
               // strong = bolded p
               .html( // display ex: 1st ["pooled" : 0.83]
               `<strong>${percentile + " Percentile"}</strong><br/>
-              ${readableOutcomes[outcomes.indexOf(xVar)]} %: ${d[query_male]}`)
+              ${readableOutcomes[outcomes.indexOf(xVar)]}: ${d[query_male].toFixed(4)}
+              (${(d[query_male] * 100).toFixed(2)}%)`)
               
               // event.pageX and event.pageY returns event (in this case mouse) X and Y
               // this is male bars, so have it on the left side (uses "right")
@@ -501,7 +502,8 @@ function updateVis() {
               // strong = bolded p
               .html( // display ex: 1st ["pooled" : 0.83]
               `<strong>${percentile + " Percentile"}</strong><br/>
-              ${readableOutcomes[outcomes.indexOf(xVar)]} %: ${d[query_male]}`)
+              ${readableOutcomes[outcomes.indexOf(xVar)]}: ${d[query_female].toFixed(4)}
+              (${(d[query_female] * 100).toFixed(2)}%)`)
               
               // event.pageX and event.pageY returns event (in this case mouse) X and Y
               // this is female bars, so have it on the right side (uses "left")
