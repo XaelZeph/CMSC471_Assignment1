@@ -360,17 +360,20 @@ function updateVis() {
     const query_female = `${xVar}_${g.race}_female`
 
     // Remove rows where the outcome (column value) is missing
-    filteredData = allData.filter(d =>
-        Number.isFinite(d[query_male]) &&
+    filteredMaleData = allData.filter(d =>
+      Number.isFinite(d[query_male]) 
+    )
+    filteredFemaleData = allData.filter(d =>
         Number.isFinite(d[query_female])
     );
 
-    console.log(filteredData)
+    console.log("male data: " + filteredMaleData)
+    console.log("female data: " + filteredFemaleData)
 
     bars = g.select(`#graph_${g.race}_bars`)
 
     bars.selectAll('.male-bar')
-      .data(filteredData)
+      .data(filteredMaleData)
       .join(
         // When we have new data points
         function(enter){
@@ -406,7 +409,7 @@ function updateVis() {
       )
 
     bars.selectAll('.female-bar')
-      .data(filteredData)
+      .data(filteredFemaleData)
       .join(
         // When we have new data points
         function(enter){
