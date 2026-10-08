@@ -429,8 +429,8 @@ function updateVis() {
 
             // this highlights the hovered bar
             d3.select(this) 
-              .style('stroke', 'black')
-              .style('stroke-width', '4px')
+              .style('stroke', '#004696')
+              .style('stroke-width', '2px')
           })
           .on("mouseout", function (event, d) {
             d3.select('#tooltip')
@@ -512,8 +512,8 @@ function updateVis() {
 
             // this highlights the hovered bar
             d3.select(this) 
-              .style('stroke', 'black')
-              .style('stroke-width', '4px')
+              .style('stroke', '#d4245c')
+              .style('stroke-width', '2px')
           })
           .on("mouseout", function (event, d) {
             d3.select('#tooltip')
