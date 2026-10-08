@@ -1,4 +1,9 @@
-const margin = {top: 80, right: 30, bottom: 60, left: 45};
+const margin = {top: 80, right: 45, bottom: 60, left: 45};
+
+// in order to accomodate the long race checkbox list, we made the overall width to 1000, 
+// BUT svg width (width) is still 800
+const totalWidth = 1000;
+
 const width = 800;
 const height = 600;
 
@@ -417,7 +422,7 @@ function updateVis() {
               // event.pageX and event.pageY returns event (in this case mouse) X and Y
               // this is male bars, so have it on the left side (uses "right")
               // places it juuuuust slightly left and below th emouse
-              .style("right", (-event.pageX + 1375) + "px")
+              .style("right", (-event.pageX + window.innerWidth + 25) + "px")
               // resetting (for when left is set for female-bars)
               .style("left", "auto")
               .style("top", (event.pageY - 28) + "px");
