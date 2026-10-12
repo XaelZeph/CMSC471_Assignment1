@@ -364,6 +364,14 @@ function updateVis() {
     const query_male = `${xVar}_${g.race}_male`
     const query_female = `${xVar}_${g.race}_female`
 
+    console.log("Selected outcome:", xVar);
+    console.log("Race:", g.race);
+    console.log("Scale domain:", xScales[i].domain());
+    console.log("Scale range:", xScales[i].range());
+
+    console.log("First male value:", allData[0][query_male]);
+    console.log("First female value:", allData[0][query_female]);
+
     // Remove rows where the outcome (column value) is missing
     filteredMaleData = allData.filter(d =>
       Number.isFinite(d[query_male]) 
@@ -399,6 +407,8 @@ function updateVis() {
             console.log(d) // for debugging
             console.log(event.pageX + 28) // for debugging
             
+            const value = d[`${xVar}_${g.race}_male`];
+
             percentile = d.par_pctile + "th"
 
             if (d.par_pctile == 1) {
@@ -417,8 +427,8 @@ function updateVis() {
               // strong = bolded p
               .html( // display ex: 1st ["pooled" : 0.83]
               `<strong>${percentile + " Percentile"}</strong><br/>
-              ${readableOutcomes[outcomes.indexOf(xVar)]}: ${d[query_male].toFixed(4)}
-              (${(d[query_male] * 100).toFixed(2)}%)`)
+              ${readableOutcomes[outcomes.indexOf(xVar)]}: ${value.toFixed(4)}
+              (${(value * 100).toFixed(2)}%)`)
               
               // event.pageX and event.pageY returns event (in this case mouse) X and Y
               // this is male bars, so have it on the left side (uses "right")
@@ -484,6 +494,8 @@ function updateVis() {
             console.log(d) // for debugging
             console.log(event.pageX + 28) // for debugging
             
+            const value = d[`${xVar}_${g.race}_female`];
+
             percentile = d.par_pctile + "th"
 
             if (d.par_pctile == 1) {
@@ -502,8 +514,8 @@ function updateVis() {
               // strong = bolded p
               .html( // display ex: 1st ["pooled" : 0.83]
               `<strong>${percentile + " Percentile"}</strong><br/>
-              ${readableOutcomes[outcomes.indexOf(xVar)]}: ${d[query_female].toFixed(4)}
-              (${(d[query_female] * 100).toFixed(2)}%)`)
+              ${readableOutcomes[outcomes.indexOf(xVar)]}: ${value.toFixed(4)}
+              (${(value * 100).toFixed(2)}%)`)
               
               // event.pageX and event.pageY returns event (in this case mouse) X and Y
               // this is female bars, so have it on the right side (uses "left")
