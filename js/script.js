@@ -316,7 +316,7 @@ function updateAxes() {
       .attr('class', 'axis');
 
     // Dynamic label offset and font sizes based on chart density
-    const yLabelOffset = graphs.length > 4 ? -20 : -25;
+    const yLabelOffset = graphs.length > 4 ? -20 : -35;
     const labelFontSize = graphs.length > 4 ? "8px" : "10px";
     const titleFontSize = graphs.length > 4 ? "10px" : (graphs.length > 2 ? "12px" : "14px");
 
@@ -338,7 +338,7 @@ function updateAxes() {
       .attr("text-anchor", "middle")
       .attr("fill", "black")
       .style("font-size", "11px")
-      .text(xVar)
+      .text(`${readableOutcomes[outcomes.indexOf(xVar)]} Rate`)
       .attr('class', 'label');
 
     // Graph title
