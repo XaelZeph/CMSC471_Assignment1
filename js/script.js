@@ -38,7 +38,6 @@ const svg = d3.select("#chart")
   .append("svg")
   .attr("width", width)
   .attr("height", height)
-  .call(zoom)
 
 const barClip = svg.append("defs")
   .append("clipPath")
@@ -58,10 +57,10 @@ const axisClip = svg.append("defs")
     .attr("x", -38)
     .attr("y", -10);
 
-function zoom(svg) {
-  const extent = [[margin.left, margin.top], [width - margin.right, height - margin.top]];
+function zoom(graph) {
+  const extent = [[margin.left, 0], [width - margin.right, innerHeight]];
 
-  svg.call(d3.zoom()
+  graph.call(d3.zoom()
       .scaleExtent([1, 8])
       .translateExtent(extent)
       .extent(extent)
@@ -69,15 +68,15 @@ function zoom(svg) {
 
   function zoomed(event) {
     graphs.forEach((g, i) => {
-      yScales[i].range([g.height, 0].map(d => event.transform.applyY(d)));
+      const yRescalled = event.transform.rescaleY(yScales[i])
       
       const zoomAmount = event.transform.k > 0 ? event.transform.k : 1;
       const barHeight = Math.max(1, (g.height / (allData.length / zoomAmount)) * 0.85);
 
-      g.selectAll(".male-bar").attr("y", d => yScales[i](d.par_pctile) - barHeight).attr("height", barHeight);
-      g.selectAll(".female-bar").attr("y", d => yScales[i](d.par_pctile) - barHeight).attr("height", barHeight);
+      g.selectAll(".male-bar").attr("y", d => {if (d.par_pctile == 100) {console.log("par_pctile " + yRescalled(d.par_pctile))}; return yRescalled(d.par_pctile)}).attr("height", barHeight);
+      g.selectAll(".female-bar").attr("y", d => yRescalled(d.par_pctile)).attr("height", barHeight);
 
-      const yAxis = d3.axisLeft(yScales[i])
+      const yAxis = d3.axisLeft(yRescalled)
       .ticks(10)
       .tickFormat(d => {
         label = ''
@@ -108,7 +107,7 @@ function init() {
     // loop through percentiles in order to fix str into numbers
     data => {
       // get query
-      console.log(data)
+      // console.log(data)
             
       data.forEach(d => {
         d.par_pctile = +d.par_pctile;
@@ -263,6 +262,7 @@ function createGraph(race) {
   
   const g = svg.append("g")
     .attr('id', `graph_${race}`)
+    .call(zoom)
 
   g.race = race;
 
@@ -452,8 +452,8 @@ function updateVis() {
 
           // THIS IS MOUSEOVER/TOOLTIP STUFF
           .on('mouseover', function (event, d) {
-            console.log(d) // for debugging
-            console.log(event.pageX + 28) // for debugging
+            // console.log(d) // for debugging
+            // console.log(event.pageX + 28) // for debugging
             
             const value = d[`${xVar}_${g.race}_male`];
 
@@ -539,8 +539,8 @@ function updateVis() {
 
                       // THIS IS MOUSEOVER/TOOLTIP STUFF
           .on('mouseover', function (event, d) {
-            console.log(d) // for debugging
-            console.log(event.pageX + 28) // for debugging
+            // console.log(d) // for debugging
+            // console.log(event.pageX + 28) // for debugging
             
             const value = d[`${xVar}_${g.race}_female`];
 
