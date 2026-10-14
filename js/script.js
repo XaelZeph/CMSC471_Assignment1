@@ -396,7 +396,7 @@ function updateAxes() {
       .attr("text-anchor", "middle")
       .style("font-size", titleFontSize)
       .style("font-weight", "bold")
-      .text(`${readableOutcomes[outcomes.indexOf(xVar)]} (${g.race})`)
+      .text(`${readableOutcomes[outcomes.indexOf(xVar)]} (${readableRaces[races.indexOf(g.race)]})`)
       .attr('class', 'title');
   })
 }
