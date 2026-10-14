@@ -38,6 +38,135 @@
 
     <div id="tooltip" style="display:none"></div> 
 
+    <div>
+        <h1>
+            Write Up
+        </h1>
+
+        <p>
+            <strong> 
+            Introduction
+            </strong>
+        </p>
+
+        <p>
+            Our dataset is the “All Outcomes at the National Level by Race, Gender and Parental Income Percentile” dataset that was used by Raj Chetty and his team for their “Changing Opportunity” paper. This dataset measures outcomes from a national perspective and organizes data in rows corresponding to parental income percentile rather than geographic region (like county or census tract). It contains predicted outcomes for children based on a combination of their race, their gender, and their parents’ income percentile. 
+        </p>
+        
+
+        <p>
+            We decided to select a subset of the outcomes, and we used two main methods to eliminate what we saw as non-critical ones. The first is that we left out complicated outcomes (like KIR and KFR) that were not intuitive to us and thus unlikely for users to easily understand. The second is that when we encountered “sets” of related variables (for example: married and marr_age), we opted to select only the outcome that was of most interest. Our final subset contains a variety of outcomes that allow users to explore themes like child labor, education level, marital/partnered status, geographic mobility, and economic mobility.
+        </p>
+
+        <p>
+            <strong>
+                Design Decision and Implemented Interactions
+            </strong>
+        </p>
+
+        <p>
+            <strong style="color:gray;font-style: italic;">
+                Final Design
+            </strong>
+        </p>
+        
+
+        <p>
+            Our final design incorporates dynamic querying, details on demand, and zooming. We start with a dropdown menu that allows the user to select an outcome of interest. In addition to the dropdown, we have checkboxes that correspond to the racial categories defined in the codebook: [white, Black, Hispanic, Asian, Native American (natam), pooled].
+        </p>
+        <p>
+            We decided to have the pooled graph up by default because it provides a useful aggregate view of outcomes across racial categories. The user can select/deselect any number of additional desired categories to view the corresponding graphs.
+        </p>
+        <p>
+            Once an outcome and race(s) are selected, the dataset will be re-queried in order to obtain values for that outcome for every combination of percentile category, race, and gender. The graphs will be updated accordingly to display the new outcome name and outcome range and data.
+        </p>
+        <p>
+            For each graph, the outcome is on the x-axis, with 0 at the midpoint and the maximum value (for that outcome’s range) on both ends of the x-axis; the left side is for male data, while the right side is female. This side-by-side placement of these bars makes it easier for users to compare outcome values by gender within the same percentile. 
+        </p>
+        <p>
+            The percentile is on the y-axis. Because the dataset includes rows for all percentiles, we opted to use ticks on the y-axis in increments of 10 for a clean look. However, all percentiles are displayed in order to see the full distribution shape.
+        </p>
+        <p>
+            A tool we added was details on demand (tooltip). This allows the user to hover over any bar to see the exact numeric value for the outcome.
+        </p>
+        <p>
+            Another tool we added was zooming, which allows the user to zoom in on a range of interest (for percentile) when exploring outcome data. This also makes using tooltip easier, as the bars are wider.
+        </p>
+
+        <p>
+            <strong style="color:gray;font-style: italic;">
+                Previous Iterations
+            </strong>
+        </p>
+
+        <p>
+            When discussing potential design options, we wanted to ensure that we could display data with a sufficient level of detail without detracting from users’ ability to make comparisons between demographic groups. Initially, we had wanted to use a dataset that measured outcomes at the county or census tract level and create a visualization with a map that could be recolored dynamically. For this hypothetical setup, users would hover over a specific county or tract to view the graphs for that region. This would have satisfied the “details on demand” requirement in a different way.
+        </p>
+        <p>
+            However, there were two main issues with this approach. The main issue is there is no readily available map for tract nor county. The second is that the county- and tract-level datasets involve an additional variable (region). Although this might be useful when it comes to the level of detail provided, we realized that it would make it more difficult for users to draw larger patterns from their observations. By choosing to focus on combinations of only percentile, race, and gender (at the national level), we reduced complexity while still keeping enough attributes for in-depth analysis.
+        </p>
+
+        <p>
+            <strong>
+                References to Data Sources
+            </strong>
+        </p>
+        
+
+        <p>
+            <a href="https://opportunityinsights.org/wp-content/uploads/2019/07/Codebook-for-Table-7.pdf">Codebook for Table 7: All Outcomes at the National Level by Race, Gender and Parental Income Percentile</a>
+            </p>
+        <p>
+            <a href="https://observablehq.com/@d3/zoomable-bar-chart ">zoom example by mike</a>
+           </p>
+        <p> <a href="https://d3-graph-gallery.com/graph/interactivity_button.html">examples of how to make interactive buttons and checkboxes</a>
+           </p>
+        <p> <a href="https://observablehq.com/@dakoop/reading-in-data-learn-js-data ">how to parse csv</a>
+           </p>
+        <p> <a href="https://stackoverflow.com/questions/5767325/how-can-i-remove-a-specific-item-from-an-array-in-javascript  ">arrays in javascript</a>
+           </p>
+        <p> <a href="https://css-tricks.com/snippets/css/a-guide-to-flexbox/  ">how to flexbox</a>
+           </p>
+        <p> <a href="https://jonathansoma.com/lede/storytelling/d3/user-input-checkboxes-dropdowns/  ">how to checkboxes</a>
+        </p>
+
+        <p>
+            <strong>
+                Development Process
+            </strong>
+        </p>
+
+        <p>
+            At our first meeting, after our initial discussion of preferences regarding datasets, we set up a clear meeting cadence to keep ourselves on track. We decided on weekly two-hour sessions on Wednesdays after class and virtual sessions on Saturdays on an as-needed basis if challenges arose. We also set up a shared folder in Google Drive to organize documents for project planning (ideas & sketches), this write-up, and a demo video script. 
+        </p>
+        <p>
+            We didn’t decide on formal roles within the group. The three of us worked equally in the ideation process for settling on the appropriate dataset and overall goals. Then, when evaluating tasks for each stage, we divided responsibilities based on our personal strengths and preferences. 
+        </p>
+        <p>
+            I (Ankita) took on most of the tasks related to project management and writing. For example, I led discussions about major project decisions, such as (1) which outcomes should be included in our analysis and why and (2) which internal deadlines we would set for each phase (dataset planning, quality check, demo). I also wrote this write-up and the demo video requirements.
+        </p>
+        <p>
+            Stephanie and Xael split up the bulk of the coding tasks. Stephanie coded several exploratory “proof-of-concept” visualizations to help us decide between potential designs by weighing pros and cons (compactness, intuitiveness, etc.). Xael worked on the code for the “Outcome” dropdown menu and the “Race” checkbox selector as well as the logic for dynamic querying and the graphs. Xael and I collaborated to determine how to cleanly compartmentalize different functions in our code since we had to add and remove graphs. We also worked on the dynamic re-sizing and spacing of the graphs as well as the tooltips. Lastly, Xael implemented the zooming interactive feature.
+        </p>
+        <p>
+            We estimate that we spent 10-12 hours coding. The most difficult aspect was restructuring the entire structure to hold multiple graphs, combined with figuring out the logic to create new graphs (checkboxes) and dynamically resize. 
+        </p>
+
+        <p>
+            <strong>
+                Summary of AI usage
+            </strong>
+        </p>
+
+        <p>
+            During the proof-of-concept phase, we used ChatGPT to understand how to implement two components of our graphs: the vertical spacing between bars (to avoid overlap/touching) and the extension of bars to the left and right of a central y-axis.
+        </p>
+        <p>
+            During the main development phase, when we attempted to combine our checkbox functionality with the graph resizing, we ran into issues where graphs were overlapping and axes were not being removed consistently between de-selections. We used Gemini to debug our code. We ended up implementing not just dynamic padding (based on the number of graphs) but also dynamic tick re-numbering, font re-sizing, and y label offset. Additionally, we realized that we had to remove the graph from our internal “graphs” array prior to removing the actual graph from the SVG.
+
+        </p>
+    </div>
+
 
     <script src="js/script.js"></script>
 
