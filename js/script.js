@@ -38,6 +38,68 @@ const svg = d3.select("#chart")
   .append("svg")
   .attr("width", width)
   .attr("height", height)
+  .call(zoom)
+
+const barClip = svg.append("defs")
+  .append("clipPath")
+    .attr("id", "bar-height-clip")
+  .append("rect")
+    .attr("width", width)
+    .attr("height", innerHeight)
+    .attr("x", 0)
+    .attr("y", 0);
+
+const axisClip = svg.append("defs")
+  .append("clipPath")
+    .attr("id", "axis-height-clip")
+  .append("rect")
+    .attr("width", width)
+    .attr("height", innerHeight + 10)
+    .attr("x", -38)
+    .attr("y", -10);
+
+function zoom(svg) {
+  const extent = [[margin.left, margin.top], [width - margin.right, height - margin.top]];
+
+  svg.call(d3.zoom()
+      .scaleExtent([1, 8])
+      .translateExtent(extent)
+      .extent(extent)
+      .on("zoom", zoomed));
+
+  function zoomed(event) {
+    graphs.forEach((g, i) => {
+      yScales[i].range([g.height, 0].map(d => event.transform.applyY(d)));
+      
+      const zoomAmount = event.transform.k > 0 ? event.transform.k : 1;
+      const barHeight = Math.max(1, (g.height / (allData.length / zoomAmount)) * 0.85);
+
+      g.selectAll(".male-bar").attr("y", d => yScales[i](d.par_pctile) - barHeight).attr("height", barHeight);
+      g.selectAll(".female-bar").attr("y", d => yScales[i](d.par_pctile) - barHeight).attr("height", barHeight);
+
+      const yAxis = d3.axisLeft(yScales[i])
+      .ticks(10)
+      .tickFormat(d => {
+        label = ''
+        if (d == 1) {
+          label=`${d}st`
+        }
+        else if (d == 2) {
+          label=`${d}nd`
+        }
+        else if (d == 3) {
+          label=`${d}rd`
+        }
+        else {
+          label=`${d}th`
+        }
+        return label
+      }
+      )
+      svg.selectAll(".y-axis").call(yAxis);
+    })
+  }
+}
 
 function init() {
   d3.csv("data/national_percentile_outcomes.csv")
@@ -101,7 +163,7 @@ function setupDropDown() {
     .on('change', function (event) {
       xVar = d3.select(this).property("value")
       // update chart
-      graphs.forEach(g => g.selectAll('.axis, .label, .title').remove())
+      graphs.forEach(g => g.selectAll('.x-axis, .y-axis, .label, .title').remove())
       updateAxes(); 
       updateVis();
 
@@ -149,7 +211,7 @@ function setupCheckBox() {
         d3.select(`#graph_${this.value}`).remove()
         
         // clean up sub-elements from remaining graphs before recalculating
-        graphs.forEach(g => g.selectAll('.axis, .label, .title').remove())
+        graphs.forEach(g => g.selectAll('.x-axis, .y-axis, .label, .title').remove())
 
         // TODO: currently not working
         recalcSizes()
@@ -197,7 +259,7 @@ function recalcSizes() {
 function createGraph(race) {
 
   // new graph is being added, make sure to remove all previous axis + labels + data
-  graphs.forEach(g => g.selectAll('.axis, .label, .title').remove())
+  graphs.forEach(g => g.selectAll('.x-axis, .y-axis, .label, .title').remove())
   
   const g = svg.append("g")
     .attr('id', `graph_${race}`)
@@ -206,24 +268,9 @@ function createGraph(race) {
 
   graphs.push(g)
 
-  // TODO: i don't believe we need this? as the scale should make sure it doesn't extend out of graph area
-  // // Clip bars so they cannot extend outside the graph area
-  // const clip = g.append("defs")
-  //   .append("clipPath")
-  //   .attr("id", "chart-clip");
-
-  // clip.append("rect")
-  //   .attr("x", g.x)
-  //   .attr("y", 0)
-  //   .attr("width", g.width)
-  //   .attr("height", g.height);
-
-  // console.log(clip.width)
-  // console.log(clip.height)
-
   // Put bars inside the clipped graph area
   const bars = g.append("g").attr('id', `graph_${race}_bars`)
-    // .attr("clip-path", "url(#chart-clip)");
+    .attr("clip-path", "url(#bar-height-clip)");
 
   recalcSizes()
 
@@ -237,7 +284,7 @@ function updateAxes() {
 
   graphs.forEach(g => {
     // remove previous axis/labels attached specifically to this graph
-    g.selectAll('.axis, .label, .title').remove()
+    g.selectAll('.x-axis, .y-axis, .label, .title').remove()
 
     const query_male = `${xVar}_${g.race}_male`
     const query_female = `${xVar}_${g.race}_female`
@@ -306,17 +353,18 @@ function updateAxes() {
           "transform",
           `translate(0,${g.height})`
       )
-      .attr('class', 'axis')
+      .attr('class', 'x-axis')
       .call(xAxis);
 
     // Render Y-axis on every graph
     g.append("g")
+      .attr("clip-path", "url(#axis-height-clip)")
       .attr("transform", "translate(0, 0)")
       .call(yAxis)
-      .attr('class', 'axis');
+      .attr('class', 'y-axis');
 
     // Dynamic label offset and font sizes based on chart density
-    const yLabelOffset = graphs.length > 4 ? -35 : -40;
+    const yLabelOffset = graphs.length > 4 ? -35 : -38;
     const labelFontSize = graphs.length > 4 ? "8px" : "10px";
     const titleFontSize = graphs.length > 4 ? "10px" : (graphs.length > 2 ? "12px" : "14px");
 
@@ -557,6 +605,7 @@ function updateVis() {
           .remove()
         }
       )
+    // initZoom(g)
   })
 
 }
