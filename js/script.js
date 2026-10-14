@@ -316,7 +316,7 @@ function updateAxes() {
       .attr('class', 'axis');
 
     // Dynamic label offset and font sizes based on chart density
-    const yLabelOffset = graphs.length > 4 ? -20 : -35;
+    const yLabelOffset = graphs.length > 4 ? -35 : -40;
     const labelFontSize = graphs.length > 4 ? "8px" : "10px";
     const titleFontSize = graphs.length > 4 ? "10px" : (graphs.length > 2 ? "12px" : "14px");
 
